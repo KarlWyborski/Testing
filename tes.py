@@ -1,6 +1,8 @@
 import RPi.GPIO as GPIO
 import time
 
+from datetime import datetime
+
 from tkinter import *
 import tkinter.font
 
@@ -54,17 +56,16 @@ def op_button(channel):
 def tick():
     global time1
     time1 = 0
-    time2 = time.strftime('%H:%M:%S')
-    if convert_time(time2) != time1:
+    time2 = time.strftime('%I:%M:%S %p')
+    print(time2)
+    # if convert_time(time2) != time1:
+    #     time1 = time2
+    #     clockTime.configure(text = time2)
+    #     clockTime.after(200, tick)
+    if time2 != time1:
         time1 = time2
         clockTime.configure(text = time2)
-        clockTime.after(200, tick)
-    #if time2 != time1:
-        #time1 = time2
-        #clockTime.configure(text = time2)
-        #clockTime.after(200,tick)
-
-def convert_time(time_to_cv):
+        clockTime.after(200,tick)
     
 #Runs at end of script
 def close():
