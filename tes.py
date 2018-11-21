@@ -48,6 +48,18 @@ def op_button(channel):
                 temp_co_change = 0
                 print(co_time)
                 co_time_label.configure(text = str(co_time) + " - " + str(co_time+5))
+                file = open("test.txt", "a")
+                time_stamp = time.localtime()
+                #writes CO time
+                file.write(str(co_time))
+                print(str(co_time))
+                i = 0
+                while i < 9:
+                    file.write("," + str(time_stamp[i]))
+                    print("," + str(time_stamp[i]))
+                    i += 1
+                file.write("\n")
+                file.close
             else:
                 print("Carry out time can now be changed.\n")
                 co_change = 1
@@ -57,11 +69,6 @@ def tick():
     global time1
     time1 = 0
     time2 = time.strftime('%I:%M:%S %p')
-    print(time2)
-    # if convert_time(time2) != time1:
-    #     time1 = time2
-    #     clockTime.configure(text = time2)
-    #     clockTime.after(200, tick)
     if time2 != time1:
         time1 = time2
         clockTime.configure(text = time2)
@@ -94,7 +101,7 @@ co_change = 0
 #tkinter setup
 win = Tk()
 win.title("Carry Out Time")
-myFont = tkinter.font.Font(family = 'Helvetica',size = 24, weight = "bold")
+myFont = tkinter.font.Font(family = 'Helvetica',size = 48, weight = "bold")
 
 ###Widgets
 ##Frames
@@ -129,6 +136,9 @@ try:
     GPIO.add_event_detect(11, GPIO.RISING, callback=up_button)
     GPIO.add_event_detect(7 , GPIO.RISING, callback=down_button)
     GPIO.add_event_detect(13, GPIO.RISING, callback=op_button)
+    
+    
+    
     
     tick()
     win.mainloop()
