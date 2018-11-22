@@ -1,5 +1,6 @@
 import RPi.GPIO as GPIO
 import time
+import os
 
 from datetime import datetime
 
@@ -48,22 +49,53 @@ def op_button(channel):
                 temp_co_change = 0
                 print(co_time)
                 co_time_label.configure(text = str(co_time) + " - " + str(co_time+5))
-                file = open("test.txt", "a")
                 time_stamp = time.localtime()
                 #writes CO time
-                file.write(str(co_time))
-                print(str(co_time))
+                str_to_write = str(co_time)
+                print(str_to_write)
                 i = 0
                 while i < 9:
-                    file.write("," + str(time_stamp[i]))
-                    print("," + str(time_stamp[i]))
+                    str_to_write = (str_to_write + "," + str(time_stamp[i]))
                     i += 1
-                file.write("\n")
-                file.close
+                print(str_to_write)
+                text_insert(file_name,str_to_write + "\n")
+                load_history()
             else:
                 print("Carry out time can now be changed.\n")
                 co_change = 1
-        op_ts = time_now
+        #op_ts =
+
+def text_insert(originalfilename,string):
+    with open(originalfilename,'r') as f:
+        with open('newfile.txt','w') as f2: 
+            f2.write(string)
+            f2.write(f.read())
+    os.rename('newfile.txt',originalfilename)
+
+def load_history():
+    f = open(file_name, "r")
+    i = 0
+    for l in f:
+        l_sep = l.split(",",9)
+        print(l_sep)
+        if int(l_sep[4]) > 12:
+            l_sep[4] = str(int(l_sep[4]) - 12)
+            print(l_sep[4])
+            am_pm = "PM"
+            print(am_pm)
+        else:
+            am_pm = "AM"
+            
+        if i == 0:
+            co_time = l_sep[0]
+            co_time_label.configure(text = co_time + " - " + str(int(co_time)+5))
+            i += 1
+        elif i < 5:
+            hist_times[i-1].configure(text = l_sep[0] + " - " + str(int(l_sep[0])+5)
+                                    + "                      "
+                                    + l_sep[4] + ":" + l_sep[5] + "  " + am_pm)
+            i += 1
+        
 
 def tick():
     global time1
@@ -94,7 +126,7 @@ op_ts = up_ts
 
 co_change = 0
 
-
+file_name = "test.txt"
 
 
 
@@ -118,7 +150,24 @@ clockTime.pack()
 clockTime.configure(text="insert time", font = myFont)
 co_time_label = Label(topFrame)
 co_time_label.pack()
-co_time_label.configure(text = co_time, font = myFont)
+co_time_label.configure(text = str(co_time) + " - " + str(co_time+5), font = myFont)
+
+hist_time1 = Label(midFrame)
+hist_time1.pack()
+hist_time1.configure(text="## - ##     HH:MM", font = myFont)
+hist_time2 = Label(midFrame)
+hist_time2.pack()
+hist_time2.configure(text="## - ##     HH:MM", font = myFont)
+hist_time3 = Label(midFrame)
+hist_time3.pack()
+hist_time3.configure(text="## - ##     HH:MM", font = myFont)
+hist_time4 = Label(midFrame)
+hist_time4.pack()
+hist_time4.configure(text="## - ##     HH:MM", font = myFont)
+
+hist_times = [hist_time1,hist_time2,hist_time3,hist_time4]
+              
+##seperators
 
 ##Buttons
 testbutton = Button(botFrame, text = "EXIT", font = myFont, command = close, bg ='red')
@@ -128,6 +177,7 @@ testbutton.pack()
 
 
 try:
+    load_history()
     #Pin Setup
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup(7, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
@@ -142,7 +192,7 @@ try:
     
     tick()
     win.mainloop()
-    
+    win.protocol('WM_DELETE_WINDOW', close)
     
         
 except KeyboardInterrupt:
