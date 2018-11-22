@@ -83,6 +83,10 @@ def load_history():
             print(l_sep[4])
             am_pm = "PM"
             print(am_pm)
+        elif int(l_sep[4]) == 12:
+            am_pm = "PM"
+        elif int(l_sep[4]) == 0:
+            l_sep[4] = "12"
         else:
             am_pm = "AM"
             
@@ -178,6 +182,8 @@ testbutton.pack()
 
 try:
     load_history()
+    co_time = int(co_time_label.cget("text")[:2])
+    print(co_time_label.cget("text")[:2])
     #Pin Setup
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup(7, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
