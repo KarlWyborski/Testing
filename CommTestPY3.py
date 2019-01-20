@@ -9,7 +9,7 @@ from tkinter import *
 import os
 ##import Tkinter.font
 
-
+port = 12345
 
 helv70 = ('Helvetica',70)
 helv70B = ('Helvetica Bold',70)
@@ -33,7 +33,7 @@ class Server:
     
     
     
-    win.title("Carry Out Time")
+    win.title("Carry Out Server")
     
     
     def __init__(self):
@@ -318,14 +318,15 @@ class Server:
     
     def handler(self, c, a):
         while True:
-            data = c.recv(1024).encode('utf-8')
+            data = c.recv(1024).decode('utf-8')
+            print(data)
             if data == 'CurrentTime':
                 c.send(str(self.iCurrentTime).encode('utf-8'))
             elif data == 'FullHist':
                 c.send(self.sHistTimes[0] + ',' + self.sHistTimes[1] + ',' + self.sHistTimes[2] + ',' + self.sHistTimes[3] + ',' + self.sHistTimes[4])
                 c.send(self.sHistStamps[0] + ',' + self.sHistStamps[1] + ',' + self.sHistStamps[2] + ',' + self.sHistStamps[3] + ',' + self.sHistStamps[4])
             else:
-                c.send(('I got:').encode('utf-8') + data)
+                c.send(('I got:' + data).encode('utf-8'))
             if not data:
                 print(str(a[0]) + ':' + str(a[1]), "disconnected")
                 self.connections.remove(c)
@@ -335,11 +336,21 @@ class Server:
     
 
 class ClientSmall:
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
     
     def sendMsg(self):
         while True:
-            self.sock.send(('CurrentTime').encode('utf-8'))
+            
+            print(str(threading.active_count()) + 'in send thread')
+            try:
+                self.sock.send(('CurrentTime').encode('utf-8'))
+                print('Sending data Request: CurrentTime')
+            except BrokenPipeError as e:
+                print('BrokenPipeError detected...')
+                self.lCurrentTime.configure(bg = 'Red')
+                self.sock.close()
+                time.sleep(1)
+                self.connect()
             time.sleep(1)
     
     def rcvMsg(self, lCurrentTime, iCurrentTime):
@@ -347,25 +358,39 @@ class ClientSmall:
             data = self.sock.recv(1024)
             if not data:
                 break
-            print(str(data.encode('utf-8')))
-            iCurrentTime = int(str(data.encode('utf-8')))
+            print(str(data.decode('utf-8')))
+            iCurrentTime = int(str(data.decode('utf-8')))
             lCurrentTime.configure(text = str(iCurrentTime) + ' - ' + str(iCurrentTime + 5))
     
+    def connect(self):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            self.sock.connect((self.ipAddress, port))
+            rcvThread = threading.Thread(target=self.rcvMsg, args=(self.lCurrentTime, self.iCurrentTime))
+            rcvThread.daemon = True
+            rcvThread.start()
+            self.lCurrentTime.configure(bg = 'White')
+        except ConnectionRefusedError as e:
+            self.sock.close()
+            print('Connection Failed. Retrying...')
+            print(threading.active_count())
+            time.sleep(10)
+            self.connect()
+    
     def __init__(self, address):
-        self.sock.connect((address, 12345))
-        iCurrentTime = 0
+        self.ipAddress = address
         
-        lCurrentTime = Label(win)
-        lCurrentTime.pack()
-        lCurrentTime.configure(text="## - ##", font = helv48B)
+        self.iCurrentTime = 0
         
+        self.lCurrentTime = Label(win)
+        self.lCurrentTime.pack()
+        self.lCurrentTime.configure(text="## - ##", font = helv70B)
+        self.connect()
         sendThread = threading.Thread(target=self.sendMsg)
         sendThread.daemon = True
         sendThread.start()
         
-        rcvThread = threading.Thread(target=self.rcvMsg, args=(lCurrentTime, iCurrentTime))
-        rcvThread.daemon = True
-        rcvThread.start()
+        
         
         
         
@@ -403,7 +428,7 @@ class ClientBig:
         
         lCurrentTime = Label(win)
         lCurrentTime.pack()
-        lCurrentTime.configure(text="## - ##", font = helv48B)
+        lCurrentTime.configure(text="## - ##", font = helv70B)
         
         sendThread = threading.Thread(target=self.sendMsg)
         sendThread.daemon = True
