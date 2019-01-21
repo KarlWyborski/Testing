@@ -855,7 +855,7 @@ class SmallClient(Client, SmallWindow):
 
     
 if (len(sys.argv) > 1):
-    client = ClientSmall(sys.argv[1])
+    client = SmallClient(sys.argv[1])
     client.run()
 ##elif (len(sys.argv) == 2):
 ##    client = ClientBig(sys.argv[1])
