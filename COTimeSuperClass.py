@@ -56,8 +56,9 @@ class Server:
                 
                 c.send(str(self.iCurrentTime).encode('utf-8'))
             elif data == 'FullHist':
-                c.send(sHistTimes[0] + ',' + sHistTimes[1] + ',' + sHistTimes[2] + ',' + sHistTimes[3] + ',' + sHistTimes[4])
-                c.send(sHistStamps[0] + ',' + sHistStamps[1] + ',' + sHistStamps[2] + ',' + sHistStamps[3] + ',' + sHistStamps[4])
+                c.send((self.sHistTimes[0] + ',' + self.sHistTimes[1] + ',' + self.sHistTimes[2] + ',' + self.sHistTimes[3] + ',' + self.sHistTimes[4]
+                       + ',' + self.sHistStamps[0] + ',' + self.sHistStamps[1] + ',' + self.sHistStamps[2] + ',' + self.sHistStamps[3] + ',' + self.sHistStamps[4]).encode('utf-8'))
+##                c.send(sHistStamps[0] + ',' + sHistStamps[1] + ',' + sHistStamps[2] + ',' + sHistStamps[3] + ',' + sHistStamps[4])
             else:
                 c.send(('I got:' + data).encode('utf-8'))
             if not data:
@@ -82,7 +83,7 @@ class Client:
             print(str(threading.active_count()) + 'in send thread')
             try:
                 self.sock.send((self.sRequest).encode('utf-8'))
-                print('Sending data Request: CurrentTime')
+                print('Sending data Request: ' + self.sRequest)
             except BrokenPipeError as e:
                 print('BrokenPipeError detected...')
                 self.connState = False
@@ -216,7 +217,6 @@ class BigWindow:
 class SmallWindow:
     
     def __init__(self):
-        self.sRequest = 'CurrentTime'
         self.iCurrentTime = 0
         self.win = Tk()
         self.lCurrentTime = Label(self.win)
@@ -403,11 +403,52 @@ class BigServer(Server, BigWindow):
         os.rename('newfile.txt',originalfilename)
 
 class BigClient(Client, BigWindow):
-    pass
+    def __init__ (self, address):
+        self.data = 'self.data'
+        Client.__init__ (self, address)
+        BigWindow.__init__ (self)
+        self.sRequest = 'FullHist'
+        self.startUpdateThread()
+        self.win.mainloop()
+    
+    def startUpdateThread(self):
+        updateThread = threading.Thread(target=self.updateWin)
+        updateThread.daemon = True
+        updateThread.start()
+        print('Update Thread Started.')
+    
+    def updateWin(self):
+        while True:
+            print('win Tick')
+            iCurrentTime = self.data
+            print('Printing iCurrentTime')
+            print(iCurrentTime)
+            print(type(iCurrentTime))
+            if self.connState:
+                self.lCurrentTime.configure(bg='White')
+            else:
+                self.lCurrentTime.configure(bg='Red')
+            if self.data != 'self.data' and type(self.data) == type('data'):
+                l_sep = self.data.split(',')
+                i = 0
+                while i < 5:
+                    if i == 0:
+                        self.lCurrentTime.configure(text=l_sep[i])
+                    else:
+                        self.lHistTimes[i-1].configure(text=l_sep[i])
+                    i += 1
+                while i < 10:
+                    if i == 5:
+                        self.lCurrentStamp.configure(text=l_sep[i])
+                    else:
+                        self.lHistStamps[i-6].configure(text=l_sep[i])
+                    i += 1
+            time.sleep(1)
 
 class SmallClient(Client, SmallWindow):
     
     def __init__ (self, address):
+        self.sRequest = 'CurrentTime'
         self.data = 'self.data'
         Client.__init__ (self, address)
         SmallWindow.__init__ (self)
@@ -438,7 +479,10 @@ class SmallClient(Client, SmallWindow):
 
     
 if (len(sys.argv) > 1):
-    client = SmallClient(sys.argv[1])
+    if sys.argv[2] == 'small':
+        client = SmallClient(sys.argv[1])
+    elif sys.argv[2] == 'big':
+        client = BigClient(sys.argv[1])
 ##    client.run()
 ##elif (len(sys.argv) == 2):
 ##    client = ClientBig(sys.argv[1])
