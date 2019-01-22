@@ -448,10 +448,10 @@ class BigClient(Client, BigWindow):
 class SmallClient(Client, SmallWindow):
     
     def __init__ (self, address):
-        self.sRequest = 'CurrentTime'
         self.data = 'self.data'
         Client.__init__ (self, address)
         SmallWindow.__init__ (self)
+        self.sRequest = 'CurrentTime'
         self.startUpdateThread()
         self.win.mainloop()
     
