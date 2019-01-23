@@ -26,7 +26,7 @@ class Server:
     iCurrentStamp = 0
     iAddTime = 0
     bToggle = False
-    sHistFileName = "/home/pi/TEST/test.txt"
+    sHistFileName = "/home/pi/DeweysProject/Testing/test.txt"
     
     def __init__(self):
         self.sock.bind(('0.0.0.0', 12345))
