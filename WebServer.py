@@ -1,41 +1,23 @@
-import http.server
-import socketserver
+from http.server import HTTPServer, BaseHTTPRequestHandler
 
-##PORT = 8080
-Handler = http.server.BaseHTTPRequestHandler
 
-class S(Handler):
-    def _set_headers(self):
-        self.send_response(200)
-        self.send_header('Content-Type', 'text/html')
-        self.end_headers()
+class Serv(BaseHTTPRequestHandler):
     
     def do_GET(self):
-        self._set_headers()
-        self.wfile.write(b"<html><body><h1>Hi!</h1></body></html>")
-    
-    def do_HEAD(self):
-        self._set_headers()
-    
+        if self.path == '/':
+            self.path = '/index.html'
+        try:
+            file_to_open = open(self.path[1:]).read()
+            self.send_response(200)
+        except
+            file_to_open = 'File not found'
+            self.send_response(404)
+        self.end_headers()
+        self.wfile.write(bytes(file_to_open, 'utf-8'))
+        
     def do_POST(self):
-        self._set_headers()
-        self.wfile.write(b"<html><body><h1>POST!</h1></body></html>")
-
-def run(server_class=http.server.HTTPServer, handler_class=S, PORT = 8080):
-    server_address = ('',PORT)
-    httpd = server_class(server_address, handler_class)
-    print('Starting httpd...')
-    httpd.serve_forever()
-
-if __name__ == '__main__':
-    from sys import argv
-    
-    if len(argv) == 2:
-        run(port=int(argv[1]))
-    else:
-        run()
-
-
-##    
-##print("serving at port", PORT)
-##socketserver.TCPServer(("",PORT), Handler).serve_forever()
+	file_to_open = open('/post.html').read()
+        self.wfile.write(bytes(file_to_open, 'utf-8'))
+        
+httpd = HTTPServer(('localhost',8080), Serv)
+httpd.serve_forever()
