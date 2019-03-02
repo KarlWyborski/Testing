@@ -12,7 +12,7 @@ import os
 port = 12345
 
 helv70 = ('Helvetica',70)
-helv70B = ('Helvetica Bold',70)
+helv70B = ('Helvetica Bold',100)
 helv30 = ('Helvetica', 30)
 ##win = Tk()
 ##helv36 = font.Font(family = 'Helvetica',size = 70)
