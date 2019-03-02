@@ -17,49 +17,64 @@ def rcvMsg():
     global secOffset
     
     data = 'a'
-    while True:
-        data = sock.recv(1024)
-        if not data:
-            break
-        data = data.decode('utf-8').split('\n')
-        print(data)
-        max = 6
-        if len(data) < max:
-            max = len(data)
-        else:
-            pass
-        i = 0
-        # i = 0
-        tempData = data[i].split(',')
-        bSET = tempData[0]
-        iAddTime = tempData[1]
-        hourOffset = int(tempData[2])
-        minOffset = int(tempData[3])
-        secOffset = int(tempData[4])
-        
-        if bSET == 'True':
-            lAddTime.configure(text=str(iAddTime))
-        else:
-            lAddTime.configure(text='')
-        
-        i += 1
-        
-        while i < max:
-            tempData = data[i].split(',')
-            print(i)
-            print(tempData)
-            if int(tempData[4]) > 12:
-                lStamps[i-1].configure(text=str(int(tempData[4])-12) + ':' + tempData[5] +' PM')
-            elif int(tempData[4]) == 0:
-                lStamps[i-1].configure(text='12:' + tempData[5] + ' AM')
-            elif int(tempData[4]) < 12:
-                lStamps[i-1].configure(text=tempData[4]+ ':' + tempData[5] +' AM')
-            elif int(tempData[4]) == 12:
-                lStamps[i-1].configure(text='12:' + tempData[5] + ' PM')
+    b1 = True
+    while b1:
+        try:
+            data = sock.recv(1024)
+            if not data:
+                break
+            if data.decode('utf-8') == 'ConnTest':
+                print('StillConnected')
+            else:
+                data = data.decode('utf-8').split('\n')
+                print(data)
+                max = 6
+                if len(data) < max:
+                    max = len(data)
+                else:
+                    pass
+                i = 0
+                # i = 0
+                tempData = data[i].split(',')
+                bSET = tempData[0]
+                iAddTime = tempData[1]
+                hourOffset = int(tempData[2])
+                minOffset = int(tempData[3])
+                secOffset = int(tempData[4])
                 
-            lTimes[i-1].configure(text=tempData[0] + ' - ' + str(int(tempData[0]) + 5))
-            i += 1
-            
+                if bSET == 'True':
+                    lAddTime.configure(text=str(iAddTime))
+                else:
+                    lAddTime.configure(text='')
+                
+                i += 1
+                
+                while i < max:
+                    tempData = data[i].split(',')
+                    print(i)
+                    print(tempData)
+                    
+                    #formats minute
+                    if int(tempData[5]) < 10:
+                        tempData[5] = '0'+tempData[5]
+                    
+                    #formats hour and AM or PM
+                    if int(tempData[4]) > 12:
+                        lStamps[i-1].configure(text=str(int(tempData[4])-12) + ':' + tempData[5] +' PM')
+                    elif int(tempData[4]) == 0:
+                        lStamps[i-1].configure(text='12:' + tempData[5] + ' AM')
+                    elif int(tempData[4]) < 12:
+                        lStamps[i-1].configure(text=tempData[4]+ ':' + tempData[5] +' AM')
+                    elif int(tempData[4]) == 12:
+                        lStamps[i-1].configure(text='12:' + tempData[5] + ' PM')
+                        
+                    lTimes[i-1].configure(text=tempData[0] + ' - ' + str(int(tempData[0]) + 5))
+                    i += 1
+        except socket.timeout:
+            print('socket.timeout')
+            sock.close()
+            b1=False
+            connect()
         
         
             
@@ -69,6 +84,10 @@ def rcvMsg():
 
 def connect():
     global connState
+    global sock
+    connState = False
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(10.0)
     while not connState:
         try:
             print('Connecting...')
@@ -77,7 +96,6 @@ def connect():
             startRcvThread()
             connState = True
         except ConnectionRefusedError:
-            sock.close()
             print('Connection Failed. Retrying in 10...')
             time.sleep(10)
 
@@ -86,7 +104,7 @@ def startRcvThread():
     rcvThread.daemon = True
     rcvThread.start()
     print('Rcv Thread Started.')
-
+    
 ##def startSendThread():
 ##    time.sleep(1)
 ##    sendThread = threading.Thread(target=sendMsg)
@@ -242,7 +260,7 @@ iAddTime = 0
 iCurrentTime = 0
 bSET = False
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
+sock.settimeout(10.0)
 hourOffset=0
 minOffset=0
 secOffset=0

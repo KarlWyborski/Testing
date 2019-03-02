@@ -85,7 +85,16 @@ def on_SET():
     else:
         bSET=True
     broadcast(str_allData())
-    
+
+def connTest():
+    while True:
+        broadcast('ConnTest')
+        time.sleep(1)
+
+def startConnThread():
+    connThread = threading.Thread(target=connTest)
+    connThread.daemon = True
+    connThread.start()
 
 def text_insert(originalfilename,string):
         with open(originalfilename,'r') as f:
@@ -124,9 +133,11 @@ def checkData():
         print('File for today not found. Creating new file...')
         f = open(dataPath + '/' + fileName, 'w')
         f.write('15')
-        stamp = time.localtime()
+        stamp = adjustTime()
         for i in stamp:
             f.write(',' + str(i))
+        f.close()
+        f = open(dataPath + '/' + fileName, 'r')
     fullHistData = f.read()
     print(fullHistData)
     iCurrentTime = int(fullHistData.split('\n')[0].split(',')[0])
@@ -195,6 +206,7 @@ checkData()
 sock.bind(('0.0.0.0', 12343))
 sock.listen(1)
 startAccThread()
+startConnThread()
 try:
     print('Running socket server...')
     while True:
