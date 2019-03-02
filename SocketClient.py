@@ -98,6 +98,9 @@ def connect():
         except ConnectionRefusedError:
             print('Connection Failed. Retrying in 10...')
             time.sleep(10)
+	except socket.timeout:
+            print('Connetion Timeout. Rerying in 10...')
+            time.sleep(10)
 
 def startRcvThread():
     rcvThread = threading.Thread(target=rcvMsg)
