@@ -24,7 +24,8 @@ def rcvMsg():
             if not data:
                 break
             if data.decode('utf-8') == 'ConnTest':
-                pass
+                tempTime = adjustTime()
+                print(str(tempTime[3])+ ':' + str(tempTime[4]) + ':' + str(tempTime[5]))
             else:
                 data = data.decode('utf-8').split('\n')
                 print(data)
