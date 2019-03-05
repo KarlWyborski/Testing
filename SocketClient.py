@@ -24,7 +24,7 @@ def rcvMsg():
             if not data:
                 break
             if data.decode('utf-8') == 'ConnTest':
-                print('StillConnected')
+                pass
             else:
                 data = data.decode('utf-8').split('\n')
                 print(data)
@@ -73,6 +73,7 @@ def rcvMsg():
         except socket.timeout:
             print('socket.timeout')
             sock.close()
+            lCurrentTime.configure(bg='Red')
             b1=False
             connect()
         
@@ -94,11 +95,12 @@ def connect():
             sock.connect((ipAddress, PORT))
             print('Connected')
             startRcvThread()
+            lCurrentTime.configure(bg='White')
             connState = True
         except ConnectionRefusedError:
             print('Connection Failed. Retrying in 10...')
             time.sleep(10)
-	except socket.timeout:
+        except socket.timeout:
             print('Connetion Timeout. Rerying in 10...')
             time.sleep(10)
 
@@ -203,49 +205,136 @@ def adjustTime():
     
     inTime[3] = inTime[3] + hourOffset + tempHour
     return inTime
+
+
+
+#--------------------------------------------------------------------
+#tkinter setup functions
+def setup1920x1080():
+    global frameLeft
+    global frameRight
+    global clock
+    global textCurrentTime
+    global lCurrentTime
+    global lAddTime
+    global lCurrentStamp
+    global lHistTime1
+    global lHistStamp1
+    global lHistTime2
+    global lHistStamp2
+    global lHistTime3
+    global lHistStamp3
+    global lHistTime4
+    global lHistStamp4
+    global lTimes
+    global lStamps
     
+    print('setup 1920x1080')
+    
+    frameLeft.pack(side=LEFT, expand=True, fill=BOTH)
+    frameRight.pack(side=RIGHT, expand=True, fill=BOTH)
+    print('width: ' + str(win.winfo_screenwidth()))
+    
+    clock = Label(frameLeft, text="insert time", font = 'Times 70', bg='gray70')
+    clock.pack(side = BOTTOM, fill=X)
+    
+    textCurrentTime = Label(frameLeft, bg='White', height=1, text='Current CO Time', font='Times 30')
+    textCurrentTime.pack(fill=X)
+
+    lCurrentTime = Label(frameLeft, bg='White', text="## - ##", font = 'Times 100')
+    lCurrentTime.pack(fill=X)
+
+    lAddTime = Label(frameLeft, bg='White', text="", font = 'Times 70')
+    lAddTime.pack(fill=X)
+
+    lCurrentStamp = Label(frameLeft, bg='pale green', height = 2, text="Updated at: HH:MM", font = 'Times 40')
+    lCurrentStamp.pack(fill=X)
+
+    lHistTime1 = Label(frameRight, pady=15, bg='gray70', text="-- - --", font = 'Times 70')
+    lHistTime1.pack(fill=X)
+
+    lHistStamp1 = Label(frameRight, pady=15, anchor=SE, bg='gray70', text="HH:MM", font = 'Times 40')
+    lHistStamp1.pack(fill=X)
+
+    lHistTime2 = Label(frameRight, pady=15, bg='White', text="-- - --", font = 'Times 70')
+    lHistTime2.pack(fill=X)
+
+    lHistStamp2 = Label(frameRight, pady=15, anchor=SE, bg='White', text="HH:MM", font = 'Times 40')
+    lHistStamp2.pack(fill=X)
+
+    lHistTime3 = Label(frameRight, pady=15, bg='gray70', text="-- - --", font = 'Times 70')
+    lHistTime3.pack(fill=X)
+
+    lHistStamp3 = Label(frameRight, pady=15, anchor=SE, bg='gray70', text="HH:MM", font = 'Times 40')
+    lHistStamp3.pack(fill=X)
+
+    lHistTime4 = Label(frameRight, pady=15, bg='White', text="-- - --", font = 'Times 70')
+    lHistTime4.pack(fill=X)
+
+    lHistStamp4 = Label(frameRight, pady=15, anchor=SE, bg='White', text="HH:MM", font = 'Times 40')
+    lHistStamp4.pack(fill=X)
+    
+    lTimes = [lCurrentTime,lHistTime1,lHistTime2,lHistTime3,lHistTime4]
+    lStamps = [lCurrentStamp,lHistStamp1,lHistStamp2,lHistStamp3,lHistStamp4]
+    
+def setup1080x1920():
+    pass
+
+def setup800x600():
+    lCurrentTime.pack(fill=X)
+    lAddTime.pack(fill=X)
+
+def setup720x480():
+    lCurrentTime.pack(fill=X)
+    
+
+
+
 #--------------------------------------------------------
 #Sets up TKinter window
 win = Tk()
 
+frameLeft = Frame(win)
+frameRight = Frame(win)
+
 clock = Label(win, text="insert time", font = 'Times 70', bg='gray70')
-clock.pack(side = BOTTOM, fill=X)
+##clock.pack(side = BOTTOM, fill=X)
 
 textCurrentTime = Label(win, bg='White', height=1, text='Current CO Time', font='Times 30')
-textCurrentTime.pack(fill=X)
+##textCurrentTime.pack(fill=X)
 
 lCurrentTime = Label(win, bg='White', text="## - ##", font = 'Times 100')
-lCurrentTime.pack(fill=X)
+##lCurrentTime.pack(fill=X)
 
 lAddTime = Label(win, bg='White', text="", font = 'Times 70')
-lAddTime.pack(fill=X)
+##lAddTime.pack(fill=X)
 
 lCurrentStamp = Label(win, bg='pale green', height = 2, text="Updated at: HH:MM", font = 'Times 40')
-lCurrentStamp.pack(fill=X)
+##lCurrentStamp.pack(fill=X)
 
 lHistTime1 = Label(win, pady=15, bg='gray70', text="-- - --", font = 'Times 70')
-lHistTime1.pack(fill=X)
+##lHistTime1.pack(fill=X)
 
 lHistStamp1 = Label(win, pady=15, anchor=SE, bg='gray70', text="HH:MM", font = 'Times 40')
-lHistStamp1.pack(fill=X)
+##lHistStamp1.pack(fill=X)
 
 lHistTime2 = Label(win, pady=15, bg='White', text="-- - --", font = 'Times 70')
-lHistTime2.pack(fill=X)
+##lHistTime2.pack(fill=X)
 
 lHistStamp2 = Label(win, pady=15, anchor=SE, bg='White', text="HH:MM", font = 'Times 40')
-lHistStamp2.pack(fill=X)
+##lHistStamp2.pack(fill=X)
 
 lHistTime3 = Label(win, pady=15, bg='gray70', text="-- - --", font = 'Times 70')
-lHistTime3.pack(fill=X)
+##lHistTime3.pack(fill=X)
 
 lHistStamp3 = Label(win, pady=15, anchor=SE, bg='gray70', text="HH:MM", font = 'Times 40')
-lHistStamp3.pack(fill=X)
+##lHistStamp3.pack(fill=X)
 
 lHistTime4 = Label(win, pady=15, bg='White', text="-- - --", font = 'Times 70')
-lHistTime4.pack(fill=X)
+##lHistTime4.pack(fill=X)
 
 lHistStamp4 = Label(win, pady=15, anchor=SE, bg='White', text="HH:MM", font = 'Times 40')
-lHistStamp4.pack(fill=X)
+##lHistStamp4.pack(fill=X)
 
 lTimes = [lCurrentTime,lHistTime1,lHistTime2,lHistTime3,lHistTime4]
 lStamps = [lCurrentStamp,lHistStamp1,lHistStamp2,lHistStamp3,lHistStamp4]
@@ -273,6 +362,16 @@ connect()
 startClockThread()
 ##startSendThread()
 
+if sys.argv[2] == '0':
+    setup1920x1080()
+elif sys.argv[2] == '1':
+    setup800x600()
+elif sys.argv[2] == '2':
+    setup720x480()
+
+win.geometry("{0}x{1}+0+0".format(win.winfo_screenwidth(), win.winfo_screenheight()))
+##frameLeft.configure(height=win.winfo_screenheight())
+##frameRight.configure(height=win.winfo_screenheight())
 win.protocol("WM_DELETE_WINDOW", cleanup)
 win.bind('<Key>', onKeyPress)
 win.mainloop()

@@ -49,7 +49,12 @@ def handler(c, a):
 
 def broadcast(msg):
     for c in connections:
-        c.send(msg.encode('utf-8'))
+        try:
+            c.send(msg.encode('utf-8'))
+        except BrokenPipeError:
+            print('broken pip error')
+            connections.remove(c)
+            c.close()
 
 def on_UP():
     global iAddTime
