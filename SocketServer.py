@@ -65,7 +65,8 @@ def on_UP():
 def on_DOWN():
     global iAddTime
     if bSET:
-        iAddTime -= 5
+        if iAddTime + iCurrentTime > 15:
+            iAddTime -= 5
         broadcast(str_allData())
 
 def on_SET():
