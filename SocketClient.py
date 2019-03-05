@@ -103,6 +103,9 @@ def connect():
         except socket.timeout:
             print('Connetion Timeout. Rerying in 10...')
             time.sleep(10)
+        except OSError:
+            print('OSError. Rerying in 10...')
+            time.sleep(10)
 
 def startRcvThread():
     rcvThread = threading.Thread(target=rcvMsg)
