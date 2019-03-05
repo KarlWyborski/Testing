@@ -287,6 +287,7 @@ def setup800x600():
     lCurrentTime.pack(fill=X)
     lAddTime.pack(fill=X)
     clock.pack(side=BOTTOM, fill=X)
+    lCurrentStamp.pack(side=BOTTOM, fill=X)
 
 def setup720x480():
     lCurrentTime.pack(fill=X)

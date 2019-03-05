@@ -182,7 +182,10 @@ def adjustTime():
     return inTime
 
 def str_allData():
-    allData = str(bSET)+','+ str(iAddTime)+','+str(hourOffset)+','+str(minOffset)+','+str(secOffset)+'\n'
+    if iAddTime > 0:
+        allData = str(bSET)+',+'+ str(iAddTime)+','+str(hourOffset)+','+str(minOffset)+','+str(secOffset)+'\n'
+    else:
+        allData = str(bSET)+','+ str(iAddTime)+','+str(hourOffset)+','+str(minOffset)+','+str(secOffset)+'\n'
     allData = allData +  fullHistData
     return allData
     
@@ -198,7 +201,7 @@ bSET = False
 
     #Clock offset CONSTANTS
 hourOffset = 0
-minOffset = 5
+minOffset = 1
 secOffset = 30
 
 dataPath = './data'
