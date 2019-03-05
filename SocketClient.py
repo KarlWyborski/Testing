@@ -296,9 +296,10 @@ def setup720x480():
 #--------------------------------------------------------
 #Sets up TKinter window
 win = Tk()
+win.configure(bg='White')
 
-frameLeft = Frame(win)
-frameRight = Frame(win)
+frameLeft = Frame(win,bg='White',borderwidth=1)
+frameRight = Frame(win,bg='White',borderwidth=1)
 
 clock = Label(win, text="insert time", font = 'Times 70', bg='gray70')
 ##clock.pack(side = BOTTOM, fill=X)
